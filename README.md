@@ -36,6 +36,7 @@ packages/backend/
    Crie um arquivo `.env` na raiz do backend com a variável:
    ```env
    DATABASE_URL=postgresql://usuario:senha@host:porta/banco
+   JWT_SECRET=sua-chave
    ```
    (Use a string de conexão do Supabase ou do seu PostgreSQL)
 

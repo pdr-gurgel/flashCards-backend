@@ -2,10 +2,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 import Fastify from 'fastify';
 import userRoutes from './routes/user.js';
+import authRoutes from './routes/auth.js';
 
 const fastify = Fastify({ logger: true });
 // Rotas
 fastify.register(userRoutes);
+fastify.register(authRoutes);
 
 const PORT = process.env.PORT || 3001;
 

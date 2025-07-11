@@ -1,18 +1,13 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import Fastify from 'fastify';
 import userRoutes from './routes/user.js';
 import authRoutes from './routes/auth.js';
 import cors from '@fastify/cors';
+import config from './config/index.js';
 
 const fastify = Fastify({ logger: true });
 
 // Configuração CORS para permitir requisições do frontend
-fastify.register(cors, {
-  origin: true, // Permite todas as origens em ambiente de desenvolvimento
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-});
+fastify.register(cors, config.cors);
 
 // Hook para responder requisições preflight OPTIONS
 fastify.addHook('preHandler', (request, reply, done) => {
@@ -27,9 +22,7 @@ fastify.addHook('preHandler', (request, reply, done) => {
 fastify.register(userRoutes);
 fastify.register(authRoutes);
 
-const PORT = process.env.PORT || 3001;
-
-fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+fastify.listen({ port: config.server.port, host: config.server.host }, (err, address) => {
   if (err) {
     fastify.log.error(err);
     process.exit(1);

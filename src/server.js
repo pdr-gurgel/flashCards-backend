@@ -3,12 +3,12 @@ dotenv.config();
 import Fastify from 'fastify';
 import userRoutes from './routes/user.js';
 import authRoutes from './routes/auth.js';
+import cors from '@fastify/cors';
 
 const fastify = Fastify({ logger: true });
 
 // Configuração CORS para permitir requisições do frontend
-const cors = await import('@fastify/cors');
-fastify.register(cors.default, {
+fastify.register(cors, {
   origin: true, // Permite todas as origens em ambiente de desenvolvimento
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

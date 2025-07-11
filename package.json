@@ -6,9 +6,7 @@
     "type": "module",
     "scripts": {
         "dev": "node src/server.js",
-        "start": "npm install @fastify/cors@8.5.0 && NODE_ENV=production node src/server.js",
-        "build": "npm ci",
-        "postinstall": "npm install @fastify/cors@8.5.0",
+        "start": "NODE_ENV=production node src/server.js",
         "lint": "echo 'Adicione um linter se desejar'"
     },
     "keywords": [

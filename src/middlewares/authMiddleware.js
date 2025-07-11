@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
+import config from '../config/index.js';
 
 class AuthMiddleware {
     authenticateJWT(req, reply, done) {
@@ -15,8 +14,8 @@ class AuthMiddleware {
         }
 
         try {
-            const decoded = jwt.verify(token, JWT_SECRET);
-            req.user = decoded; // Disponibiliza os dados do usuário para a rota
+            const decoded = jwt.verify(token, config.jwt.secret);
+            req.user = decoded;
             done();
         } catch (err) {
             return reply.code(401).send({ error: 'Token inválido ou expirado.' });

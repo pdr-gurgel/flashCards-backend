@@ -1,42 +1,39 @@
-import client from '../models/db.js';
 import bcrypt from 'bcrypt';
+import User from '../models/User.js';
 
 class UserService {
+    /**
+     * Cria um novo usuário após validações e geração de hash da senha
+     * @param {Object} userData - Dados do usuário
+     * @returns {Promise<Object>} Usuário criado
+     */
     async createUser({ username, email, password }) {
         try {
             console.log('🔧 UserService: Iniciando criação de usuário:', { username, email });
-            // Hash da senha
+
+            const existingUser = await User.findByEmail(email);
+            if (existingUser) {
+                throw new Error('Email já está em uso');
+            }
+
             console.log('🔧 UserService: Gerando hash da senha...');
             const passwordHash = await bcrypt.hash(password, 10);
             console.log('🔧 UserService: Hash da senha gerado com sucesso');
-            // Inserção no banco usando pg client
-            console.log('🔧 UserService: Executando query de inserção...');
-            const result = await client.query(
-                'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
-                [username, email, passwordHash]
-            );
-            console.log('🔧 UserService: Usuário criado com sucesso:', result.rows[0]);
-            return result.rows[0];
+
+            const user = await User.create({ username, email, passwordHash });
+            return user;
         } catch (error) {
-            console.error('❌ UserService: Erro ao criar usuário');
-            console.error('❌ Tipo do erro:', error.constructor.name);
-            console.error('❌ Mensagem do erro:', error.message);
-            console.error('❌ Stack trace:', error.stack);
-            if (error.code) {
-                console.error('❌ Código do erro PostgreSQL:', error.code);
-            }
-            if (error.constraint) {
-                console.error('❌ Constraint violada:', error.constraint);
-            }
-            if (error.detail) {
-                console.error('❌ Detalhes do erro:', error.detail);
-            }
+            console.error('❌ UserService: Erro ao criar usuário:', error.message);
             throw error;
         }
     }
+    /**
+     * Busca um usuário pelo email
+     * @param {string} email - Email do usuário
+     * @returns {Promise<Object|null>} Objeto do usuário ou null
+     */
     async getUserByEmail(email) {
-        const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-        return result.rows[0];
+        return await User.findByEmail(email);
     }
 }
 

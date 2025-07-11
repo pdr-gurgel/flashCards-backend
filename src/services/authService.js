@@ -1,27 +1,28 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-import UserService from './userService.js';
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
-const JWT_EXPIRES_IN = '1h';
+import User from '../models/User.js';
+import config from '../config/index.js';
 
 class AuthService {
-    constructor() {
-        this.userService = new UserService();
-    }
-
+    /**
+     * Autentica um usuário e gera um token JWT
+     * @param {string} email - Email do usuário
+     * @param {string} password - Senha do usuário
+     * @returns {Promise<Object>} Objeto contendo token e dados do usuário
+     * @throws {Error} Se as credenciais forem inválidas
+     */
     async loginUser(email, password) {
-        const user = await this.userService.getUserByEmail(email);
-        if (!user) throw new Error('E-mail não existente');
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid) throw new Error('Credenciais inválidas');
-        // Não incluir senha no payload
+        const user = await User.findByEmail(email);
+        if (!user) throw new Error('E-mail não encontrado');
+
+        if (!await bcrypt.compare(password, user.password)) {
+            throw new Error('Senha incorreta');
+        }
+
         const payload = { id: user.id, username: user.username, email: user.email };
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+        const token = jwt.sign(payload, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
         return { token, user: payload };
     }
 }
 
-export default AuthService; 
+export default AuthService;

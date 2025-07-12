@@ -14,7 +14,7 @@ export default {
     expiresIn: '1h'
   },
   cors: {
-    origin: true,
+    origin: process.env.CORS_ORIGIN,
     methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],

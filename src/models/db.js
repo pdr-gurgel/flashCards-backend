@@ -1,8 +1,10 @@
 import config from '../config/index.js';
-import { Client } from 'pg';
+import { Pool } from 'pg';
 
-const client = new Client({
-    connectionString: config.database.url
+const client = new Pool({
+    connectionString: config.database.url,
+    max: 20,
+    idleTimeoutMillis: 20000
 });
 
 await client.connect();

@@ -1,4 +1,4 @@
-import db from './db.js';
+import client from './db.js';
 
 class User {
   /**
@@ -8,7 +8,7 @@ class User {
    */
   static async findByEmail(email) {
     try {
-      const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+      const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
       return result.rows[0] || null;
     } catch (error) {
       console.error('❌ Model User: Erro ao buscar usuário por email:', error);
@@ -27,7 +27,7 @@ class User {
   static async create({ username, email, passwordHash }) {
     try {
       console.log('🔧 Model User: Executando query de inserção...');
-      const result = await db.query(
+      const result = await client.query(
         'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email',
         [username, email, passwordHash]
       );
@@ -57,7 +57,7 @@ class User {
    */
   static async findById(id) {
     try {
-      const result = await db.query(
+      const result = await client.query(
         'SELECT id, username, email FROM users WHERE id = $1',
         [id]
       );

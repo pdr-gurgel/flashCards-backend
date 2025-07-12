@@ -3,7 +3,8 @@ import userRoutes from './routes/user.js';
 import authRoutes from './routes/auth.js';
 import cors from '@fastify/cors';
 import config from './config/index.js';
-
+import dotenv from 'dotenv';
+dotenv.config();
 const fastify = Fastify({ logger: true });
 
 // Configuração CORS para permitir requisições do frontend

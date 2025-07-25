@@ -17,7 +17,18 @@ class DeckService {
      * @returns {Promise<Object>} Deck criado
      */
     async createDeck({ userId, title, icon, color }) {
-        return await Deck.create({ userId, title, icon, color });
+        return await Deck.create({ user_id: userId, title, icon, color });
+    }
+
+    /**
+     * Atualiza um deck existente
+     * @param {number} deckId - ID do deck a ser atualizado
+     * @param {number} userId - ID do usuário para validação de propriedade
+     * @param {Object} updateData - Dados para atualização
+     * @returns {Promise<Object|null>} Deck atualizado ou null se não encontrado ou não pertencer ao usuário
+     */
+    async updateDeck(deckId, userId, { title, icon, color }) {
+        return await Deck.update(deckId, userId, { title, icon, color });
     }
 }
 

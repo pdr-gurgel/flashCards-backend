@@ -6,4 +6,5 @@ const deckController = new DeckController();
 export default async function deckRoutes(fastify) {
     fastify.get('/decks', { preHandler: authMiddleware.authenticateJWT }, deckController.getAllDecks);
     fastify.post('/decks', { preHandler: authMiddleware.authenticateJWT }, deckController.createDeck);
-} 
+    fastify.put('/decks/:id', { preHandler: authMiddleware.authenticateJWT }, deckController.updateDeck);
+}

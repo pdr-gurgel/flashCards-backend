@@ -63,6 +63,68 @@ class Deck {
             throw error;
         }
     }
+
+    /**
+     * Atualiza um deck existente
+     * @param {number} deckId - ID do deck
+     * @param {number} userId - ID do usuário (para validação)
+     * @param {Object} updateData - Dados para atualização
+     * @param {string} [updateData.title] - Novo título
+     * @param {string} [updateData.icon] - Novo ícone
+     * @param {string} [updateData.color] - Nova cor
+     * @returns {Promise<Object|null>} Deck atualizado ou null se não encontrado
+     */
+    static async update(deckId, userId, { title, icon, color }) {
+        try {
+            // Verificar se o deck pertence ao usuário
+            const existingDeck = await this.findById(userId, deckId);
+            if (!existingDeck) {
+                return null;
+            }
+
+            // Construir a query dinamicamente com base nos campos fornecidos
+            const updateFields = [];
+            const values = [];
+            let paramIndex = 1;
+
+            if (title !== undefined) {
+                updateFields.push(`title = $${paramIndex++}`);
+                values.push(title);
+            }
+
+            if (icon !== undefined) {
+                updateFields.push(`icon = $${paramIndex++}`);
+                values.push(icon);
+            }
+
+            if (color !== undefined) {
+                updateFields.push(`color = $${paramIndex++}`);
+                values.push(color);
+            }
+
+            // Se não houver campos para atualizar, retornar o deck existente
+            if (updateFields.length === 0) {
+                return existingDeck;
+            }
+
+            // Adicionar o ID do deck e do usuário aos valores
+            values.push(deckId);
+            values.push(userId);
+
+            const result = await client.query(
+                `UPDATE decks 
+                 SET ${updateFields.join(', ')} 
+                 WHERE id = $${paramIndex++} AND user_id = $${paramIndex++} 
+                 RETURNING id, title, icon, color, user_id`,
+                values
+            );
+
+            return result.rows[0] || null;
+        } catch (error) {
+            console.error('Erro ao atualizar deck:', error);
+            throw error;
+        }
+    }
 }
 
 export default Deck;

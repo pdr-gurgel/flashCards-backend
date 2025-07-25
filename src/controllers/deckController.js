@@ -5,6 +5,7 @@ class DeckController {
         this.deckService = new DeckService();
         this.getAllDecks = this.getAllDecks.bind(this);
         this.createDeck = this.createDeck.bind(this);
+        this.updateDeck = this.updateDeck.bind(this);
     }
 
     /**
@@ -45,6 +46,49 @@ class DeckController {
         } catch (err) {
             console.error('Erro ao criar deck:', err);
             return reply.code(500).send({ error: 'Erro ao criar deck.' });
+        }
+    }
+
+    /**
+     * Atualiza um deck existente do usuário autenticado
+     */
+    async updateDeck(req, reply) {
+        try {
+            const userId = req.user.id;
+            const deckId = parseInt(req.params.id);
+            const { title, icon, color } = req.body;
+
+            // Validação básica
+            if (title !== undefined && (typeof title !== 'string' || title.trim().length < 2)) {
+                return reply.code(400).send({ error: 'Título do deck deve ter pelo menos 2 caracteres.' });
+            }
+            if (icon !== undefined && typeof icon !== 'string') {
+                return reply.code(400).send({ error: 'Ícone do deck deve ser uma string válida.' });
+            }
+            if (color !== undefined && typeof color !== 'string') {
+                return reply.code(400).send({ error: 'Cor do deck deve ser uma string válida.' });
+            }
+
+            // Tenta atualizar o deck
+            const updatedDeck = await this.deckService.updateDeck(
+                deckId,
+                userId,
+                { 
+                    title: title ? title.trim() : undefined,
+                    icon, 
+                    color 
+                }
+            );
+
+            // Se o deck não existe ou não pertence ao usuário
+            if (!updatedDeck) {
+                return reply.code(404).send({ error: 'Deck não encontrado.' });
+            }
+
+            return reply.code(200).send(updatedDeck);
+        } catch (err) {
+            console.error('Erro ao atualizar deck:', err);
+            return reply.code(500).send({ error: 'Erro ao atualizar deck.' });
         }
     }
 }

@@ -4,6 +4,7 @@ import authRoutes from './routes/auth.js';
 import cors from '@fastify/cors';
 import config from './config/index.js';
 import dotenv from 'dotenv';
+import deckRoutes from './routes/deck.js';
 dotenv.config();
 const fastify = Fastify({ logger: true });
 
@@ -22,6 +23,7 @@ fastify.addHook('preHandler', (request, reply, done) => {
 // Rotas
 fastify.register(userRoutes);
 fastify.register(authRoutes);
+fastify.register(deckRoutes);
 
 fastify.listen({ port: config.server.port, host: config.server.host }, (err, address) => {
   if (err) {

@@ -30,6 +30,16 @@ class DeckService {
     async updateDeck(deckId, userId, { title, icon, color }) {
         return await Deck.update(deckId, userId, { title, icon, color });
     }
+
+    /**
+     * Deleta um deck existente
+     * @param {number} deckId - ID do deck a ser deletado
+     * @param {number} userId - ID do usuário para validação de propriedade
+     * @returns {Promise<boolean>} true se deletado, false se não encontrado ou não pertencer ao usuário
+     */
+    async deleteDeck(deckId, userId) {
+        return await Deck.delete(deckId, userId);
+    }
 }
 
 export default DeckService; 

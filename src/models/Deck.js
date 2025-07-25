@@ -125,6 +125,30 @@ class Deck {
             throw error;
         }
     }
-}
+
+    /**
+     * Deleta um deck existente
+     * @param {number} deckId - ID do deck
+     * @param {number} userId - ID do usuário (para validação)
+     * @returns {Promise<boolean>} true se deletado, false se não encontrado ou não autorizado
+     */
+    static async delete(deckId, userId) {
+        try {
+            // Verificar se o deck pertence ao usuário
+            const existingDeck = await this.findById(userId, deckId);
+            if (!existingDeck) {
+                return false;
+            }
+            const result = await client.query(
+                'DELETE FROM decks WHERE id = $1 AND user_id = $2',
+                [deckId, userId]
+            );
+            return result.rowCount > 0;
+        } catch (error) {
+            console.error('Erro ao deletar deck:', error);
+            throw error;
+        }
+    }
+} // Fim da classe Deck
 
 export default Deck;

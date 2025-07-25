@@ -6,6 +6,7 @@ class DeckController {
         this.getAllDecks = this.getAllDecks.bind(this);
         this.createDeck = this.createDeck.bind(this);
         this.updateDeck = this.updateDeck.bind(this);
+        this.deleteDeck = this.deleteDeck.bind(this);
     }
 
     /**
@@ -89,6 +90,23 @@ class DeckController {
         } catch (err) {
             console.error('Erro ao atualizar deck:', err);
             return reply.code(500).send({ error: 'Erro ao atualizar deck.' });
+        }
+    }
+    /**
+     * Deleta um deck existente do usuário autenticado
+     */
+    async deleteDeck(req, reply) {
+        try {
+            const userId = req.user.id;
+            const deckId = parseInt(req.params.id);
+            const deleted = await this.deckService.deleteDeck(deckId, userId);
+            if (!deleted) {
+                return reply.code(404).send({ error: 'Deck não encontrado.' });
+            }
+            return reply.code(204).send(); // No Content
+        } catch (err) {
+            console.error('Erro ao deletar deck:', err);
+            return reply.code(500).send({ error: 'Erro ao deletar deck.' });
         }
     }
 }

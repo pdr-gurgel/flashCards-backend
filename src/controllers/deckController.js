@@ -4,6 +4,7 @@ class DeckController {
     constructor() {
         this.deckService = new DeckService();
         this.getAllDecks = this.getAllDecks.bind(this);
+        this.createDeck = this.createDeck.bind(this);
     }
 
     /**

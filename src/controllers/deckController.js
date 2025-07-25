@@ -49,4 +49,4 @@ class DeckController {
     }
 }
 
-export default DeckController; 
+export default DeckController;

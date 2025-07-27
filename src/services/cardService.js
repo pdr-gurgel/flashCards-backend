@@ -88,7 +88,7 @@ class CardService {
             }
 
             // Verifica se o deck pertence ao usuário
-            const deck = await this.deckModel.findById(deck_id, userId);
+            const deck = await this.deckModel.findById(userId, deck_id);
             if (!deck) {
                 throw new Error('Deck não encontrado ou você não tem permissão para adicionar cards a ele');
             }

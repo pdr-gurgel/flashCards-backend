@@ -1,4 +1,5 @@
 import Deck from '../models/Deck.js';
+import Card from '../models/Card.js';
 
 class DeckService {
     /**
@@ -40,6 +41,15 @@ class DeckService {
     async deleteDeck(deckId, userId) {
         return await Deck.delete(deckId, userId);
     }
+
+    /**
+     * Retorna a quantidade de cards de um deck específico
+     * @param {number} deckId
+     * @returns {Promise<number>} Quantidade de cards
+     */
+    async countCardsByDeckId(deckId) {
+        return await Card.countByDeckId(deckId);
+    }
 }
 
-export default DeckService; 
+export default DeckService;

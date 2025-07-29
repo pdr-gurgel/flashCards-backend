@@ -138,7 +138,7 @@ class Card {
             }
 
             values.push(id);
-            
+
             const result = await client.query(
                 `UPDATE cards 
                 SET ${updates.join(', ')}
@@ -168,6 +168,23 @@ class Card {
             return result.rowCount > 0;
         } catch (error) {
             console.error('Erro ao remover card:', error);
+            throw error;
+        }
+    }
+    /**
+     * Conta o número de cards em um deck específico
+     * @param {number} deckId - ID do deck
+     * @returns {Promise<number>} Quantidade de cards
+     */
+    static async countByDeckId(deckId) {
+        try {
+            const result = await client.query(
+                'SELECT COUNT(*) AS count FROM cards WHERE deck_id = $1',
+                [deckId]
+            );
+            return parseInt(result.rows[0].count, 10);
+        } catch (error) {
+            console.error('Erro ao contar cards por deckId:', error);
             throw error;
         }
     }

@@ -8,4 +8,5 @@ export default async function deckRoutes(fastify) {
     fastify.post('/decks', { preHandler: authMiddleware.authenticateJWT }, deckController.createDeck);
     fastify.put('/decks/:id', { preHandler: authMiddleware.authenticateJWT }, deckController.updateDeck);
     fastify.delete('/decks/:id', { preHandler: authMiddleware.authenticateJWT }, deckController.deleteDeck);
+    fastify.get('/decks/:id/cards/count', { preHandler: authMiddleware.authenticateJWT }, deckController.countCardsByDeckId);
 }

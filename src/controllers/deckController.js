@@ -7,6 +7,7 @@ class DeckController {
         this.createDeck = this.createDeck.bind(this);
         this.updateDeck = this.updateDeck.bind(this);
         this.deleteDeck = this.deleteDeck.bind(this);
+        this.countCardsByDeckId = this.countCardsByDeckId.bind(this);
     }
 
     /**
@@ -74,10 +75,10 @@ class DeckController {
             const updatedDeck = await this.deckService.updateDeck(
                 deckId,
                 userId,
-                { 
+                {
                     title: title ? title.trim() : undefined,
-                    icon, 
-                    color 
+                    icon,
+                    color
                 }
             );
 
@@ -107,6 +108,22 @@ class DeckController {
         } catch (err) {
             console.error('Erro ao deletar deck:', err);
             return reply.code(500).send({ error: 'Erro ao deletar deck.' });
+        }
+    }
+    /**
+     * Retorna a quantidade de cards de um deck específico
+     */
+    async countCardsByDeckId(req, reply) {
+        try {
+            const deckId = parseInt(req.params.id);
+            if (isNaN(deckId)) {
+                return reply.code(400).send({ error: 'ID do deck inválido.' });
+            }
+            const count = await this.deckService.countCardsByDeckId(deckId);
+            return reply.code(200).send({ count });
+        } catch (err) {
+            console.error('Erro ao contar cards do deck:', err);
+            return reply.code(500).send({ error: 'Erro ao contar cards do deck.' });
         }
     }
 }

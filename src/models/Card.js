@@ -188,6 +188,27 @@ class Card {
             throw error;
         }
     }
+
+    /**
+     * Conta o número total de cards de um usuário
+     * @param {number} userId - ID do usuário
+     * @returns {Promise<number>} Quantidade total de cards do usuário
+     */
+    static async countByUserId(userId) {
+        try {
+            const result = await client.query(
+                `SELECT COUNT(*) AS count 
+                FROM cards c
+                JOIN decks d ON c.deck_id = d.id
+                WHERE d.user_id = $1`,
+                [userId]
+            );
+            return parseInt(result.rows[0].count, 10);
+        } catch (error) {
+            console.error('Erro ao contar cards por userId:', error);
+            throw error;
+        }
+    }
 }
 
 export default Card;

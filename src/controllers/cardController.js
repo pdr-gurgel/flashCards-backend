@@ -3,9 +3,10 @@ import CardService from '../services/cardService.js';
 class CardController {
     constructor() {
         this.cardService = new CardService();
-        
+
         // Bind dos métodos para garantir que 'this' se refira à instância da classe
         this.getUserCards = this.getUserCards.bind(this);
+        this.countUserCards = this.countUserCards.bind(this);
         this.getCards = this.getCards.bind(this);
         this.getCard = this.getCard.bind(this);
         this.createCard = this.createCard.bind(this);
@@ -24,6 +25,22 @@ class CardController {
         } catch (error) {
             console.error('Erro ao listar cards do usuário:', error);
             return reply.code(400).send({ error: error.message || 'Erro ao listar cards do usuário' });
+        }
+    }
+
+    /**
+     * Retorna a contagem total de cards de um usuário
+     */
+    async countUserCards(req, reply) {
+        try {
+            const userId = req.user.id;
+            const count = await this.cardService.countCardsByUser(userId);
+            return reply.code(200).send({ count });
+        } catch (error) {
+            console.error('Erro ao contar cards do usuário:', error);
+            return reply.code(500).send({
+                error: error.message || 'Erro ao contar cards do usuário'
+            });
         }
     }
 

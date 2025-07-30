@@ -22,6 +22,20 @@ class CardService {
     }
 
     /**
+     * Conta o número total de cards de um usuário
+     * @param {number} userId - ID do usuário
+     * @returns {Promise<number>} Número total de cards do usuário
+     */
+    async countCardsByUser(userId) {
+        try {
+            return await this.cardModel.countByUserId(userId);
+        } catch (error) {
+            console.error('Erro no serviço ao contar cards do usuário:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Busca todos os cards de um deck específico
      * @param {number} deckId - ID do deck
      * @param {number} userId - ID do usuário para validação de permissão

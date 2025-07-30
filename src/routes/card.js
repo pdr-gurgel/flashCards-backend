@@ -13,6 +13,9 @@ export default async function cardRoutes(fastify) {
 
     // Rota para listar todos os cards do usuário autenticado
     fastify.get('/cards', cardController.getUserCards);
+    
+    // Rota para obter a contagem total de cards do usuário autenticado
+    fastify.get('/cards/count', cardController.countUserCards);
 
     // Rotas aninhadas para /decks/:deckId/cards
     fastify.register(async (fastify) => {

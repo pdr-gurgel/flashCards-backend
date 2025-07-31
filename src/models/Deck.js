@@ -149,6 +149,24 @@ class Deck {
             throw error;
         }
     }
+
+    /**
+     * Conta a quantidade de decks de um usuário
+     * @param {number} userId - ID do usuário
+     * @returns {Promise<number>} Número de decks do usuário
+     */
+    static async countByUserId(userId) {
+        try {
+            const result = await client.query(
+                'SELECT COUNT(*)::int as count FROM decks WHERE user_id = $1',
+                [userId]
+            );
+            return result.rows[0].count;
+        } catch (error) {
+            console.error('Erro ao contar decks por userId:', error);
+            throw error;
+        }
+    }
 } // Fim da classe Deck
 
 export default Deck;

@@ -50,6 +50,15 @@ class DeckService {
     async countCardsByDeckId(deckId) {
         return await Card.countByDeckId(deckId);
     }
+
+    /**
+     * Conta a quantidade de decks de um usuário
+     * @param {number} userId - ID do usuário
+     * @returns {Promise<number>} Quantidade de decks do usuário
+     */
+    async countDecksByUser(userId) {
+        return await Deck.countByUserId(userId);
+    }
 }
 
 export default DeckService;

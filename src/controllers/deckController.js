@@ -8,6 +8,7 @@ class DeckController {
         this.updateDeck = this.updateDeck.bind(this);
         this.deleteDeck = this.deleteDeck.bind(this);
         this.countCardsByDeckId = this.countCardsByDeckId.bind(this);
+        this.countUserDecks = this.countUserDecks.bind(this);
     }
 
     /**
@@ -124,6 +125,20 @@ class DeckController {
         } catch (err) {
             console.error('Erro ao contar cards do deck:', err);
             return reply.code(500).send({ error: 'Erro ao contar cards do deck.' });
+        }
+    }
+
+    /**
+     * Retorna a quantidade de decks do usuário autenticado
+     */
+    async countUserDecks(req, reply) {
+        try {
+            const userId = req.user.id;
+            const count = await this.deckService.countDecksByUser(userId);
+            return reply.code(200).send({ count });
+        } catch (err) {
+            console.error('Erro ao contar decks do usuário:', err);
+            return reply.code(500).send({ error: 'Erro ao contar decks.' });
         }
     }
 }

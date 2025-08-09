@@ -209,6 +209,45 @@ class Card {
             throw error;
         }
     }
+
+    /**
+     * Cria múltiplos cards em lote dentro de uma transação
+     * @param {Array<Object>} cards - Array de objetos de card
+     * @param {number} deckId - ID do deck ao qual os cards pertencem
+     * @returns {Promise<Array>} Lista de cards criados
+     */
+    static async createMany(cards, deckId) {
+        const clientConnection = await client.connect();
+        try {
+            await clientConnection.query('BEGIN');
+
+            const query = `
+                INSERT INTO cards (deck_id, question, response, difficulty)
+                SELECT $1, unnest($2::text[]), unnest($3::text[]), unnest($4::int[])
+                RETURNING id, deck_id, question, response, difficulty
+            `;
+
+            const questions = cards.map(c => c.question);
+            const responses = cards.map(c => c.response);
+            const difficulties = cards.map(c => c.difficulty || 1);
+
+            const result = await clientConnection.query(query, [
+                deckId,
+                questions,
+                responses,
+                difficulties
+            ]);
+
+            await clientConnection.query('COMMIT');
+            return result.rows;
+        } catch (error) {
+            await clientConnection.query('ROLLBACK');
+            console.error('Erro ao criar múltiplos cards:', error);
+            throw new Error('Falha na criação de cards em lote. A operação foi revertida.');
+        } finally {
+            clientConnection.release();
+        }
+    }
 }
 
 export default Card;

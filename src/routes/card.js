@@ -27,6 +27,7 @@ export default async function cardRoutes(fastify) {
 
         // Criar um novo card em um deck
         fastify.post('/decks/:deckId/cards', cardController.createCard);
+        fastify.post('/decks/:deckId/cards/import', cardController.importCards);
 
         // Atualizar um card existente
         fastify.put('/cards/:cardId', cardController.updateCard);

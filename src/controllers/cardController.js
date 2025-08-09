@@ -12,6 +12,7 @@ class CardController {
         this.createCard = this.createCard.bind(this);
         this.updateCard = this.updateCard.bind(this);
         this.deleteCard = this.deleteCard.bind(this);
+        this.importCards = this.importCards.bind(this);
     }
 
     /**
@@ -144,6 +145,28 @@ class CardController {
             return reply.code(204).send();
         } catch (error) {
             console.error('Erro ao remover card:', error);
+            const statusCode = error.message.includes('não encontrado') ? 404 : 400;
+            return reply.code(statusCode).send({ error: error.message });
+        }
+    }
+
+    /**
+     * Importa múltiplos cards a partir de um JSON
+     */
+    async importCards(req, reply) {
+        try {
+            const { deckId } = req.params;
+            const userId = req.user.id;
+            const { cards } = req.body;
+
+            const createdCards = await this.cardService.importCards(cards, deckId, userId);
+
+            return reply.code(201).send({
+                message: `${createdCards.length} cards importados com sucesso!`,
+                cards: createdCards
+            });
+        } catch (error) {
+            console.error('Erro ao importar cards:', error);
             const statusCode = error.message.includes('não encontrado') ? 404 : 400;
             return reply.code(statusCode).send({ error: error.message });
         }

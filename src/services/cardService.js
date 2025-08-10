@@ -44,7 +44,7 @@ class CardService {
     async getCardsByDeck(deckId, userId) {
         try {
             // Verifica se o deck pertence ao usuário
-            const deck = await this.deckModel.findById(deckId, userId);
+            const deck = await this.deckModel.findById(userId, deckId);
             if (!deck) {
                 throw new Error('Deck não encontrado ou você não tem permissão para acessá-lo');
             }
@@ -189,6 +189,41 @@ class CardService {
             return true;
         } catch (error) {
             console.error('Erro no serviço ao remover card:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Importa múltiplos cards para um deck
+     * @param {Array<Object>} cards - Lista de cards a serem importados
+     * @param {number} deckId - ID do deck de destino
+     * @param {number} userId - ID do usuário para validação de permissão
+     * @returns {Promise<Array>} Lista de cards criados
+     */
+    async importCards(cards, deckId, userId) {
+        try {
+            // 1. Valida se o deck pertence ao usuário
+            const deck = await this.deckModel.findById(userId, deckId);
+            if (!deck) {
+                throw new Error('Deck não encontrado ou você não tem permissão para acessá-lo');
+            }
+
+            // 2. Validação básica da estrutura dos cards
+            if (!Array.isArray(cards) || cards.length === 0) {
+                throw new Error('A lista de cards está vazia ou em formato inválido.');
+            }
+
+            for (const card of cards) {
+                if (!card.question || !card.response) {
+                    throw new Error('Todos os cards devem conter os campos \'question\' e \'response\'.');
+                }
+            }
+
+            // 3. Chama o método do model para criação em lote
+            return await this.cardModel.createMany(cards, deckId);
+        } catch (error) {
+            console.error('Erro no serviço ao importar cards:', error);
+            // Repassa o erro para ser tratado pelo controller
             throw error;
         }
     }

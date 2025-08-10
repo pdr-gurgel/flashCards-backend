@@ -21,6 +21,11 @@ fastify.addHook('preHandler', (request, reply, done) => {
   done();
 });
 
+// Rota de health check
+fastify.get('/health', async (request, reply) => {
+  return { status: 'ok', timestamp: new Date().toISOString() };
+});
+
 // Rotas
 fastify.register(userRoutes);
 fastify.register(authRoutes);

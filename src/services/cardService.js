@@ -44,7 +44,7 @@ class CardService {
     async getCardsByDeck(deckId, userId) {
         try {
             // Verifica se o deck pertence ao usuário
-            const deck = await this.deckModel.findById(deckId, userId);
+            const deck = await this.deckModel.findById(userId, deckId);
             if (!deck) {
                 throw new Error('Deck não encontrado ou você não tem permissão para acessá-lo');
             }
@@ -203,7 +203,7 @@ class CardService {
     async importCards(cards, deckId, userId) {
         try {
             // 1. Valida se o deck pertence ao usuário
-            const deck = await this.deckModel.findById(deckId, userId);
+            const deck = await this.deckModel.findById(userId, deckId);
             if (!deck) {
                 throw new Error('Deck não encontrado ou você não tem permissão para acessá-lo');
             }

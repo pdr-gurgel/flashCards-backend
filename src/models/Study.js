@@ -69,6 +69,7 @@ class Study {
             if (deckId) {
                 query += ` AND d.id = $${params.length + 1}`;
                 params.push(deckId);
+                console.log(`🔍 Filtrando por deck ID: ${deckId}`);
             }
 
             query += `

@@ -36,7 +36,7 @@ class Study {
      * @param {number} deckId - ID do deck (opcional)
      * @returns {Promise<Array>} Lista de cards para revisar
      */
-    static async getCardsForReview(userId, limit = 20, deckId = null) {
+    static async getCardsForReview(userId, limit = 20, deckId = null, forceAll = false) {
         try {
             let query = `
                 SELECT 
@@ -72,11 +72,15 @@ class Study {
                 console.log(`🔍 Filtrando por deck ID: ${deckId}`);
             }
 
-            query += `
+            if (!forceAll) {
+                query += `
                 AND (
                     s.last_reviewed_at IS NULL 
                     OR s.last_reviewed_at + INTERVAL '1 day' * COALESCE(s.interval, 1) <= NOW()
-                )
+                )`;
+            }
+
+            query += `
                 ORDER BY 
                     CASE WHEN s.last_reviewed_at IS NULL THEN 0 ELSE 1 END,
                     s.last_reviewed_at ASC NULLS FIRST
@@ -84,7 +88,46 @@ class Study {
             `;
             params.push(limit);
 
-            const result = await client.query(query, params);
+            let result = await client.query(query, params);
+
+            // Fallback: se forceAll e nada veio (por qualquer condição), buscar sem qualquer dependência de datas
+            if (forceAll && result.rows.length === 0) {
+                let fallbackQuery = `
+                    SELECT 
+                        c.id as card_id,
+                        c.question,
+                        c.response,
+                        c.difficulty as initial_difficulty,
+                        d.id as deck_id,
+                        d.title as deck_title,
+                        d.color as deck_color,
+                        d.icon as deck_icon,
+                        COALESCE(s.interval, 1) as interval,
+                        COALESCE(s.repetitions, 0) as repetitions,
+                        COALESCE(s.ease_factor, 2.5) as ease_factor,
+                        s.last_difficulty,
+                        s.last_reviewed_at,
+                        true as due_for_review
+                    FROM cards c
+                    JOIN decks d ON d.id = c.deck_id
+                    LEFT JOIN studies s ON s.card_id = c.id AND s.user_id = $1
+                    WHERE d.user_id = $1
+                `;
+
+                const fbParams = [userId];
+                if (deckId) {
+                    fallbackQuery += ` AND d.id = $${fbParams.length + 1}`;
+                    fbParams.push(deckId);
+                }
+                fallbackQuery += `
+                    ORDER BY c.id ASC
+                    LIMIT $${fbParams.length + 1}
+                `;
+                fbParams.push(limit);
+
+                result = await client.query(fallbackQuery, fbParams);
+            }
+
             return result.rows;
         } catch (error) {
             console.error('Erro ao buscar cards para revisão:', error);

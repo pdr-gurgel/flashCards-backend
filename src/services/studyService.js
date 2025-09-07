@@ -10,7 +10,7 @@ class StudyService {
      * @param {number} limit - Limite de cards (padrão: 20)
      * @returns {Promise<Object>} Dados da sessão de estudo
      */
-    async startStudySession(userId, deckId = null, limit = 20) {
+    async startStudySession(userId, deckId = null, limit = 20, forceAll = false) {
         try {
             // Validar se o deck pertence ao usuário (se especificado)
             if (deckId) {
@@ -21,7 +21,7 @@ class StudyService {
             }
 
             // Buscar cards para revisão
-            const cards = await Study.getCardsForReview(userId, limit, deckId);
+            const cards = await Study.getCardsForReview(userId, limit, deckId, forceAll);
 
             // Validar se os cards pertencem ao deck correto (se especificado)
             if (deckId && cards.length > 0) {

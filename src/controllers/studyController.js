@@ -24,6 +24,7 @@ class StudyController {
             const userId = req.user.id;
             const deckId = req.params.deckId ? parseInt(req.params.deckId) : null;
             const limit = parseInt(req.query.limit) || 20;
+            const forceAll = req.query.forceAll === 'true';
 
             // Validar limite
             if (limit < 1 || limit > 100) {
@@ -35,7 +36,7 @@ class StudyController {
 
             console.log(`🎓 Iniciando sessão de estudo para usuário ${userId}, deck: ${deckId || 'todos'}, limite: ${limit}`);
 
-            const session = await this.studyService.startStudySession(userId, deckId, limit);
+            const session = await this.studyService.startStudySession(userId, deckId, limit, forceAll);
 
             return reply.code(200).send({
                 success: true,

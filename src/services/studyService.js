@@ -23,6 +23,16 @@ class StudyService {
             // Buscar cards para revisão
             const cards = await Study.getCardsForReview(userId, limit, deckId);
 
+            // Validar se os cards pertencem ao deck correto (se especificado)
+            if (deckId && cards.length > 0) {
+                const invalidCards = cards.filter(card => card.deck_id != deckId);
+                if (invalidCards.length > 0) {
+                    console.error(`❌ Cards inválidos encontrados:`, invalidCards);
+                    throw new Error('Erro interno: cards de deck incorreto retornados');
+                }
+                console.log(`✅ Todos os ${cards.length} cards pertencem ao deck ${deckId}`);
+            }
+
             // Buscar estatísticas gerais do usuário
             const stats = await Study.getStudyStats(userId);
 
